@@ -3,6 +3,7 @@ Simple, elegant, connect-style router for PHP.
 
 Coming back to PHP from a JavaScript/Node perspective, I like this approach to routing:
 
+```php
 <?php
 
 require_once('./include/rest.php');
@@ -17,3 +18,4 @@ $app->get('/',endpoint);
 $app->route();
 
 ?>
+```
