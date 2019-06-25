@@ -14,7 +14,6 @@ function endpoint($req,$res) {
 
 $app = new REST('/');
 $app->get('/',endpoint);
-
 $app->route();
 
 ?>
