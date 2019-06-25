@@ -37,96 +37,59 @@ class REST {
 		$this->request = $request;
 	}
 	
-	
-	// public $pubVar = 'public';
-	// public function testPublic() {
-	// 	echo $this->pubVar;
-	// }
-	// protected $proVar = 'protected';
-	// public function testProtected() {
-	// 	echo $this->proVar;
-	// }
-	// private $priVar = 'private';
-	// public function testPrivate() {
-	// 	echo $this->priVar;
-	// }
-	
-	
 	public function route() {
-		// print_r($this->routes);
-		// $api_path='/api2'; // make into config
-		// if (isset($api_path)) {
-		// 	if (strpos($request,$api_path)===0) {
-		// 		$request = substr($request,strlen($api_path));
-		// 	}
-		// }
-		// if (preg_match('/^\/[A-Za-z0-9\-_\/]*\/?$/',$request) && in_array($method,$this->allowed_methods)) {
-		// 	$request = trim($request,'/');
-		// 	$request = explode('/',$request);
-			if (!isset($this->routes[$this->method])) {
-				$this->error(405);
-			}
-			$args = array();
-			$request = $this->request;
-			$current = &$this->routes[$this->method];
-			foreach ($request as $block) {
-				if (isset($current[$block])) {
-					$current = &$current[$block];
-				} else if (isset($current[':']) && isset($current[':']['?'])) {
-					$args[$current[':']['?']] = $block;
-					$current = &$current[':'];
-				} else {
-					$this->error(404);
-				}
-			}
-			if (isset($current['*'])) { //} && function_exists($current['*'])) {
-				if (count($args)===0) {
-					$args = null;
-				}
-				$req = (object)array(
-					'body' => $this->payload,
-					'params' => $args,
-					'method' => $this->method
-				);
-				// $res = (object)array();
-				$res = $this; // not ideal but works
-				foreach ($current['*'] as $function) {
-					if (!function_exists($function)) {
-						$this->error(500);
-					}
-					call_user_func($function,$req,$res);
-				}
-				// call_user_func($current['*'],$req,$res);
+		if (!isset($this->routes[$this->method])) {
+			$this->error(405);
+		}
+		$args = array();
+		$request = $this->request;
+		$current = &$this->routes[$this->method];
+		foreach ($request as $block) {
+			if (isset($current[$block])) {
+				$current = &$current[$block];
+			} else if (isset($current[':']) && isset($current[':']['?'])) {
+				$args[$current[':']['?']] = $block;
+				$current = &$current[':'];
 			} else {
-				$this->error(405);
+				$this->error(404);
 			}
-			
-		// } else {
-		// 	$this->error(400);
-		// }
+		}
+		if (isset($current['*'])) { //} && function_exists($current['*'])) {
+			if (count($args)===0) {
+				$args = null;
+			}
+			$req = (object)array(
+				'body' => $this->payload,
+				'params' => $args,
+				'method' => $this->method
+			);
+			// $res = (object)array();
+			$res = $this; // not ideal but works
+			foreach ($current['*'] as $function) {
+				if (!function_exists($function)) {
+					$this->error(500);
+				}
+				call_user_func($function,$req,$res);
+			}
+			// call_user_func($current['*'],$req,$res);
+		} else {
+			$this->error(405);
+		}
 	}
 	
 	private $routes = array();
-	private function assign($args) { // $method,$path,$function
-		// $api_path='/api2'; // make into config
-		// use func_get_args() if you want to add middleware
-		// but then you have to account for function being an array
-		// first arg is method, second is path, then rest are functions
-		// each function should have the next function as a callback
-		// middleware must be able to insert variables into the args
-		// $args = func_get_args();
-		if (count($args)<3) {
-		// if (!isset($function) || !isset($path) || !isset($method)) {
+	private function assign($args) {
+		if (count($args)<3) { // METHOD, PATH, FUNCTION
 			return false;
 		}
 		// print_r($args);
 		$method = $args[0];
 		$path = $args[1];
 		$functions = array_splice($args,2);
-		if ($method!==$this->method) {
-			return false; // don't waste your time - remove for async io
+		if ($method!==$this->method) { // don't waste your time - remove for async
+			return false;
 		}
-		if (!in_array($method,$this->allowed_methods)) {
+		if (!in_array($method,$this->allowed_methods)) { // same logic ^^
 			echo 'Router problem: Method not allowed. ';
 			return false;
 		}
@@ -143,11 +106,6 @@ class REST {
 		if (!isset($this->routes[$method])) {
 			$this->routes[$method] = array();
 		}
-		// $request = $_SERVER['REQUEST_URI'];
-		// if (strpos($request,$api_path)===0) {
-		// 	$request = substr($request,strlen($api_path));
-		// }
-		// $request = explode('/',trim($request,'/'));
 		$request = $this->request;
 		$current = &$this->routes[$method];
 		$depth = 0;
@@ -183,9 +141,6 @@ class REST {
 		$args = func_get_args();
 		array_unshift($args,'GET');
 		$this->assign($args);
-		// call_user_func_array(($this->assign),$args);
-		// $this->assign('GET',$path,$last);
-		// $this->assign('GET',$path,$function);
 	}
 	public function post() {
 		$args = func_get_args();
