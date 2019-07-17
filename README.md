@@ -6,7 +6,7 @@ Coming back to PHP from a JavaScript/Node perspective, I like this approach to r
 ```php
 <?php
 
-require_once('./include/rest.php');
+require_once('router.php');
 
 function endpoint($req,$res) {
 	$res->send('Bonjour le monde');
