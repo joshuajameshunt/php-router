@@ -8,13 +8,15 @@ Coming back to PHP from a JavaScript/Node perspective, I like this approach to r
 
 require_once('router.php');
 
-function endpoint($req,$res) {
+function helloWorld($req,$res) {
 	$res->send('Bonjour le monde');
 }
 
-$app = new REST('/');
-$app->get('/',endpoint);
+$app = new REST('/'); # The base path
+$app->get('/',helloWorld);
 $app->route();
 
 ?>
 ```
+
+Note: There is a way to configure this to work for ReactPHP event-loop if you want.
