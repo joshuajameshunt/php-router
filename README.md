@@ -8,12 +8,12 @@ Coming back to PHP from a JavaScript/Node perspective, I like this approach to r
 
 require_once('router.php');
 
-function helloWorld($req,$res) {
+function helloWorld($req, $res) {
 	$res->send('Bonjour le monde');
 }
 
 $app = new REST('/'); # The base path
-$app->get('/',helloWorld);
+$app->get('/', helloWorld);
 $app->route();
 
 ?>
